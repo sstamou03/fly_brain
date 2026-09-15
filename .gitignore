@@ -1,0 +1,15 @@
+# raw male-CNS v1.0 downloads (~1.1 GB, public at male-cns.janelia.org/download)
+data/
+
+# rebuilt by `python build_brain.py` (brain.npz is 198 MB, over GitHub's 100 MB limit)
+brain.npz
+brain_meta.parquet
+
+# large simulation outputs; small JSON summaries are kept
+results/*.parquet
+results/bar_rates/
+
+__pycache__/
+*.pyc
+.venv/
+.vscode/

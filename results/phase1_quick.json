@@ -1,0 +1,34 @@
+{
+  "nothing": {
+    "mn9_hz": [
+      0.0,
+      0.0
+    ],
+    "active_neurons": 0,
+    "seconds": 1.0639941692352295
+  },
+  "sugar 200Hz": {
+    "mn9_hz": [
+      180.0,
+      47.5
+    ],
+    "active_neurons": 8735,
+    "seconds": 2.2184629440307617
+  },
+  "bitter 150Hz": {
+    "mn9_hz": [
+      22.5,
+      0.0
+    ],
+    "active_neurons": 17380,
+    "seconds": 2.850935220718384
+  },
+  "sugar 200Hz + bitter 150Hz": {
+    "mn9_hz": [
+      0.0,
+      0.0
+    ],
+    "active_neurons": 17358,
+    "seconds": 2.830505132675171
+  }
+}
