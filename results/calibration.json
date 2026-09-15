@@ -1,0 +1,182 @@
+[
+  {
+    "scale": 1.0,
+    "w_syn_mV": 0.275,
+    "condition": "sugar",
+    "mn9_l_hz": 187.91665649414062,
+    "active": 20765,
+    "over_100hz": 6162,
+    "spikes_per_s": 1306596.25,
+    "seconds": 54.315165281295776
+  },
+  {
+    "scale": 1.0,
+    "w_syn_mV": 0.275,
+    "condition": "bitter",
+    "mn9_l_hz": 18.75,
+    "active": 20090,
+    "over_100hz": 6757,
+    "spikes_per_s": 1570643.25,
+    "seconds": 88.98379135131836
+  },
+  {
+    "scale": 1.0,
+    "w_syn_mV": 0.275,
+    "condition": "sugar+bitter",
+    "mn9_l_hz": 2.0833332538604736,
+    "active": 20266,
+    "over_100hz": 6785,
+    "spikes_per_s": 1575752.875,
+    "seconds": 74.1617681980133
+  },
+  {
+    "scale": 0.7,
+    "w_syn_mV": 0.1925,
+    "condition": "sugar",
+    "mn9_l_hz": 143.75,
+    "active": 4193,
+    "over_100hz": 64,
+    "spikes_per_s": 44960.8359375,
+    "seconds": 32.50051712989807
+  },
+  {
+    "scale": 0.7,
+    "w_syn_mV": 0.1925,
+    "condition": "bitter",
+    "mn9_l_hz": 0.0,
+    "active": 14867,
+    "over_100hz": 3624,
+    "spikes_per_s": 944680.375,
+    "seconds": 77.75588154792786
+  },
+  {
+    "scale": 0.7,
+    "w_syn_mV": 0.1925,
+    "condition": "sugar+bitter",
+    "mn9_l_hz": 0.0,
+    "active": 14934,
+    "over_100hz": 3628,
+    "spikes_per_s": 947122.4375,
+    "seconds": 79.149747133255
+  },
+  {
+    "scale": 0.5,
+    "w_syn_mV": 0.1375,
+    "condition": "sugar",
+    "mn9_l_hz": 27.91666603088379,
+    "active": 332,
+    "over_100hz": 11,
+    "spikes_per_s": 7127.0830078125,
+    "seconds": 38.668750524520874
+  },
+  {
+    "scale": 0.5,
+    "w_syn_mV": 0.1375,
+    "condition": "bitter",
+    "mn9_l_hz": 0.0,
+    "active": 8176,
+    "over_100hz": 54,
+    "spikes_per_s": 51001.6640625,
+    "seconds": 40.730748414993286
+  },
+  {
+    "scale": 0.5,
+    "w_syn_mV": 0.1375,
+    "condition": "sugar+bitter",
+    "mn9_l_hz": 0.0,
+    "active": 8421,
+    "over_100hz": 50,
+    "spikes_per_s": 54074.1640625,
+    "seconds": 35.964808225631714
+  },
+  {
+    "scale": 0.4,
+    "w_syn_mV": 0.11,
+    "condition": "sugar",
+    "mn9_l_hz": 0.0,
+    "active": 132,
+    "over_100hz": 5,
+    "spikes_per_s": 4083.3330078125,
+    "seconds": 40.91647696495056
+  },
+  {
+    "scale": 0.4,
+    "w_syn_mV": 0.11,
+    "condition": "bitter",
+    "mn9_l_hz": 0.0,
+    "active": 227,
+    "over_100hz": 18,
+    "spikes_per_s": 9250.0,
+    "seconds": 38.26907682418823
+  },
+  {
+    "scale": 0.4,
+    "w_syn_mV": 0.11,
+    "condition": "sugar+bitter",
+    "mn9_l_hz": 0.0,
+    "active": 316,
+    "over_100hz": 22,
+    "spikes_per_s": 12279.583984375,
+    "seconds": 46.46414041519165
+  },
+  {
+    "scale": 0.3,
+    "w_syn_mV": 0.0825,
+    "condition": "sugar",
+    "mn9_l_hz": 0.0,
+    "active": 68,
+    "over_100hz": 4,
+    "spikes_per_s": 2517.916748046875,
+    "seconds": 32.21774935722351
+  },
+  {
+    "scale": 0.3,
+    "w_syn_mV": 0.0825,
+    "condition": "bitter",
+    "mn9_l_hz": 0.0,
+    "active": 118,
+    "over_100hz": 6,
+    "spikes_per_s": 4684.5830078125,
+    "seconds": 39.32043170928955
+  },
+  {
+    "scale": 0.3,
+    "w_syn_mV": 0.0825,
+    "condition": "sugar+bitter",
+    "mn9_l_hz": 0.0,
+    "active": 175,
+    "over_100hz": 8,
+    "spikes_per_s": 6692.49951171875,
+    "seconds": 42.4190788269043
+  },
+  {
+    "scale": 0.2,
+    "w_syn_mV": 0.055,
+    "condition": "sugar",
+    "mn9_l_hz": 0.0,
+    "active": 41,
+    "over_100hz": 2,
+    "spikes_per_s": 1218.7498779296875,
+    "seconds": 43.39002823829651
+  },
+  {
+    "scale": 0.2,
+    "w_syn_mV": 0.055,
+    "condition": "bitter",
+    "mn9_l_hz": 0.0,
+    "active": 56,
+    "over_100hz": 4,
+    "spikes_per_s": 1918.3333740234375,
+    "seconds": 66.27243542671204
+  },
+  {
+    "scale": 0.2,
+    "w_syn_mV": 0.055,
+    "condition": "sugar+bitter",
+    "mn9_l_hz": 0.0,
+    "active": 91,
+    "over_100hz": 5,
+    "spikes_per_s": 3084.583251953125,
+    "seconds": 42.48073434829712
+  }
+]

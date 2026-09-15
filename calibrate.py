@@ -9,6 +9,7 @@ Sweep a scale on w_syn and keep the largest one that still satisfies the Phase-1
 with activity staying bounded (no crowd of saturated neurons).
 """
 import json
+import sys
 from pathlib import Path
 
 import numpy as np
@@ -36,8 +37,9 @@ def main():
         "sugar+bitter": (np.concatenate([sugar, bitter]), [200.0] * len(sugar) + [150.0] * len(bitter)),
     }
 
+    scales = [float(s) for s in sys.argv[1:]] or SCALES  # e.g. python calibrate.py 0.45 0.55 0.6
     rows = []
-    for scale in SCALES:
+    for scale in scales:
         for name, (idx, hz) in conditions.items():
             r = simulate(brain, idx, hz, readout_idx=[mn9_l], n_run=N_RUN, t_run=T_RUN,
                          params={"w_syn": PARAMS["w_syn"] * scale}, progress=False)
@@ -53,7 +55,8 @@ def main():
     df = pd.DataFrame(rows)
     print("\n" + df.pivot(index="scale", columns="condition", values=["mn9_l_hz", "active", "over_100hz"]).round(1).to_string())
     (ROOT / "results").mkdir(exist_ok=True)
-    (ROOT / "results" / "calibration.json").write_text(json.dumps(rows, indent=2))
+    name = "calibration.json" if scales == SCALES else f"calibration_{'_'.join(map(str, scales))}.json"
+    (ROOT / "results" / name).write_text(json.dumps(rows, indent=2))
 
 
 if __name__ == "__main__":

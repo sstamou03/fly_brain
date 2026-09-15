@@ -32,6 +32,11 @@ PARAMS = {
     "f_poi": 250,    # Poisson kick = w_syn * f_poi (always drives a spike)
 }
 
+# Shiu's w_syn was tuned on FlyWire (~50M synapses); the male CNS has 124M. calibrate.py sweeps a
+# scale on it: bitter circuits ignite between 0.50 and 0.55 (spikes/s x6), sugar -> MN9 is silent
+# below 0.45. 0.5 is the largest scale that keeps bitter bounded.
+W_SYN_MALE_CNS = PARAMS["w_syn"] * 0.5
+
 
 class Brain:
     """Connectome as CSC: column j lists the post-synaptic partners of neuron j."""

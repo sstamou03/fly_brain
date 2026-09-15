@@ -1,0 +1,122 @@
+[
+  {
+    "scale": 0.45,
+    "w_syn_mV": 0.1238,
+    "condition": "sugar",
+    "mn9_l_hz": 3.3333332538604736,
+    "active": 186,
+    "over_100hz": 7,
+    "spikes_per_s": 4972.0830078125,
+    "seconds": 316.4635648727417
+  },
+  {
+    "scale": 0.45,
+    "w_syn_mV": 0.1238,
+    "condition": "bitter",
+    "mn9_l_hz": 0.0,
+    "active": 562,
+    "over_100hz": 31,
+    "spikes_per_s": 17291.25,
+    "seconds": 29.183266401290894
+  },
+  {
+    "scale": 0.45,
+    "w_syn_mV": 0.1238,
+    "condition": "sugar+bitter",
+    "mn9_l_hz": 0.0,
+    "active": 656,
+    "over_100hz": 34,
+    "spikes_per_s": 20418.75,
+    "seconds": 29.301506996154785
+  },
+  {
+    "scale": 0.55,
+    "w_syn_mV": 0.1513,
+    "condition": "sugar",
+    "mn9_l_hz": 65.0,
+    "active": 725,
+    "over_100hz": 14,
+    "spikes_per_s": 13123.75,
+    "seconds": 26.714852333068848
+  },
+  {
+    "scale": 0.55,
+    "w_syn_mV": 0.1513,
+    "condition": "bitter",
+    "mn9_l_hz": 0.0,
+    "active": 10981,
+    "over_100hz": 374,
+    "spikes_per_s": 321701.21875,
+    "seconds": 30.232040882110596
+  },
+  {
+    "scale": 0.55,
+    "w_syn_mV": 0.1513,
+    "condition": "sugar+bitter",
+    "mn9_l_hz": 0.0,
+    "active": 11099,
+    "over_100hz": 446,
+    "spikes_per_s": 365742.46875,
+    "seconds": 24.053791046142578
+  },
+  {
+    "scale": 0.6,
+    "w_syn_mV": 0.165,
+    "condition": "sugar",
+    "mn9_l_hz": 90.41666412353516,
+    "active": 939,
+    "over_100hz": 19,
+    "spikes_per_s": 19560.0,
+    "seconds": 15.084746837615967
+  },
+  {
+    "scale": 0.6,
+    "w_syn_mV": 0.165,
+    "condition": "bitter",
+    "mn9_l_hz": 0.0,
+    "active": 13140,
+    "over_100hz": 1289,
+    "spikes_per_s": 627641.1875,
+    "seconds": 29.38370370864868
+  },
+  {
+    "scale": 0.6,
+    "w_syn_mV": 0.165,
+    "condition": "sugar+bitter",
+    "mn9_l_hz": 0.0,
+    "active": 13192,
+    "over_100hz": 1095,
+    "spikes_per_s": 602263.75,
+    "seconds": 35.857494592666626
+  },
+  {
+    "scale": 0.65,
+    "w_syn_mV": 0.1788,
+    "condition": "sugar",
+    "mn9_l_hz": 120.41666412353516,
+    "active": 1235,
+    "over_100hz": 38,
+    "spikes_per_s": 28180.416015625,
+    "seconds": 26.70590591430664
+  },
+  {
+    "scale": 0.65,
+    "w_syn_mV": 0.1788,
+    "condition": "bitter",
+    "mn9_l_hz": 0.0,
+    "active": 14115,
+    "over_100hz": 2621,
+    "spikes_per_s": 812010.75,
+    "seconds": 70.16213274002075
+  },
+  {
+    "scale": 0.65,
+    "w_syn_mV": 0.1788,
+    "condition": "sugar+bitter",
+    "mn9_l_hz": 0.0,
+    "active": 14123,
+    "over_100hz": 2671,
+    "spikes_per_s": 820068.3125,
+    "seconds": 69.5195426940918
+  }
+]
