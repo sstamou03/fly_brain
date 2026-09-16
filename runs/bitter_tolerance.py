@@ -4,7 +4,7 @@ Sweet is fixed (default 0.80, like a piña colada); the bitter channel is steppe
 channel is 0, all organs touch the drink, w_syn = W_SYN_MALE_CNS. The point where MN9_L drops to 0
 tells which drinks can score at all, since every alcoholic/acidic drink carries some bitter.
 
-usage: python bitter_tolerance.py [sweet] [--trials 6]
+usage: python -m runs.bitter_tolerance [sweet] [--trials 6]
 """
 import argparse
 import json
@@ -13,10 +13,10 @@ from pathlib import Path
 import numpy as np
 import pandas as pd
 
-from sim import W_SYN_MALE_CNS, Brain, simulate
-from taste import CHANNELS, neuron_input, taste_matrix
+from brain.sim import W_SYN_MALE_CNS, Brain, simulate
+from brain.taste import CHANNELS, neuron_input, taste_matrix
 
-ROOT = Path(__file__).parent
+ROOT = Path(__file__).resolve().parents[1]
 BITTER_LEVELS = [0.0, 0.05, 0.1, 0.15, 0.2, 0.3, 0.4, 0.6]
 
 

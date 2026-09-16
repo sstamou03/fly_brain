@@ -13,7 +13,7 @@ import numpy as np
 import pandas as pd
 import pyarrow.ipc as ipc
 
-ROOT = Path(__file__).parent
+ROOT = Path(__file__).resolve().parents[1]
 DATA = ROOT / "data"
 ANN = DATA / "body-annotations-male-cns-v1.0-minconf-0.5.feather"
 NT = DATA / "body-neurotransmitters-male-cns-v1.0.feather"

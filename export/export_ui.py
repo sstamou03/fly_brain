@@ -10,7 +10,7 @@ and the UI gets a replay of what actually happened, binned in time:
 Preference score: MN9_L firing rate first; drinks that never make MN9_L fire are ordered by how
 close its membrane potential got to threshold. So the fly always ends up somewhere.
 
-usage: python export_ui.py --menu cocktails [--extra "πορτοκάλι,Νερό"] [--trials 6]
+usage: python -m export.export_ui --menu cocktails [--extra "πορτοκάλι,Νερό"] [--trials 6]
 """
 import argparse
 import json
@@ -19,10 +19,10 @@ from pathlib import Path
 import numpy as np
 import pandas as pd
 
-from sim import PARAMS, W_SYN_MALE_CNS, Brain, simulate
-from taste import CHANNELS, INGREDIENTS, MENUS, neuron_input, taste_matrix, taste_vector
+from brain.sim import PARAMS, W_SYN_MALE_CNS, Brain, simulate
+from brain.taste import CHANNELS, INGREDIENTS, MENUS, neuron_input, taste_matrix, taste_vector
 
-ROOT = Path(__file__).parent
+ROOT = Path(__file__).resolve().parents[1]
 BIN_MS = 25.0
 K_DOWN, K_UP, MAX_EDGES = 40, 40, 400
 

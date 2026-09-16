@@ -3,8 +3,8 @@
 Expected: labellar sugar GRNs drive MN9 (proboscis extension), bitter GRNs alone do not,
 and adding bitter on top of sugar suppresses MN9.
 
-usage: python phase1_sugar.py            full run (30 trials x 1000 ms per condition)
-       python phase1_sugar.py --quick    speed check (4 trials x 100 ms)
+usage: python -m runs.phase1_sugar            full run (30 trials x 1000 ms per condition)
+       python -m runs.phase1_sugar --quick    speed check (4 trials x 100 ms)
 """
 import json
 import sys
@@ -14,9 +14,9 @@ import numpy as np
 import pandas as pd
 import torch
 
-from sim import Brain, simulate
+from brain.sim import Brain, simulate
 
-ROOT = Path(__file__).parent
+ROOT = Path(__file__).resolve().parents[1]
 torch.set_num_threads(max(1, torch.get_num_threads()))
 
 

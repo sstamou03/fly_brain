@@ -4,8 +4,8 @@ drink vector -> taste vector -> taste-neuron input -> whole-brain simulation -> 
 The drink touches legs, labellum and pharynx. All drinks share one random seed, so differences
 come from the drink and not from noise. Synaptic weight: W_SYN_MALE_CNS (see calibrate.py).
 
-usage: python bar.py                              30 trials x 1000 ms, all drinks
-       python bar.py --trials 10 --only Κόλα,Espresso,Τσίπουρο,Νερό    pilot on a subset
+usage: python -m runs.bar                              30 trials x 1000 ms, all drinks
+       python -m runs.bar --trials 10 --only Κόλα,Espresso,Τσίπουρο,Νερό    pilot on a subset
 """
 import argparse
 import json
@@ -15,10 +15,10 @@ from pathlib import Path
 import numpy as np
 import pandas as pd
 
-from sim import PARAMS, W_SYN_MALE_CNS, Brain, simulate
-from taste import CHANNELS, INGREDIENTS, MENUS, neuron_input, taste_matrix, taste_vector
+from brain.sim import PARAMS, W_SYN_MALE_CNS, Brain, simulate
+from brain.taste import CHANNELS, INGREDIENTS, MENUS, neuron_input, taste_matrix, taste_vector
 
-ROOT = Path(__file__).parent
+ROOT = Path(__file__).resolve().parents[1]
 
 
 def main():

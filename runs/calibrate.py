@@ -9,7 +9,7 @@ with activity staying bounded for the WHOLE run. Bitter ignition builds up slowl
 with 300 ms runs picked 0.5, but 1 s drinks at 0.5 still ignited. So runs are 1 s, and `growth`
 compares population activity in the last 200 ms with 100-300 ms (≈1 = steady, >>1 = igniting).
 
-usage: python calibrate.py 0.3 0.4 0.45 0.5 --ms 1000 --trials 4
+usage: python -m runs.calibrate 0.3 0.4 0.45 0.5 --ms 1000 --trials 4
 """
 import argparse
 import json
@@ -18,9 +18,9 @@ from pathlib import Path
 import numpy as np
 import pandas as pd
 
-from sim import PARAMS, Brain, simulate
+from brain.sim import PARAMS, Brain, simulate
 
-ROOT = Path(__file__).parent
+ROOT = Path(__file__).resolve().parents[1]
 BIN_MS = 50.0
 
 

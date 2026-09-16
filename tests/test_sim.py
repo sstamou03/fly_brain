@@ -9,7 +9,7 @@ from pathlib import Path
 
 import numpy as np
 
-from sim import Brain, simulate
+from brain.sim import Brain, simulate
 
 
 def toy_brain(edges, n):

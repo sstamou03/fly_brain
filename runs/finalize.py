@@ -5,7 +5,7 @@
    so the chosen drink visibly makes her want to drink and the others do not
 3. rebuild app/public/data (export_web.py)
 
-usage: python finalize.py [--menu cocktails] [--trials 6]
+usage: python -m runs.finalize [--menu cocktails] [--trials 6]
 """
 import argparse
 import json
@@ -14,7 +14,7 @@ import sys
 import time
 from pathlib import Path
 
-ROOT = Path(__file__).parent
+ROOT = Path(__file__).resolve().parents[1]
 
 
 def run(*args):

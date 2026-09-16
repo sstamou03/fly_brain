@@ -1,6 +1,6 @@
 """Where does the activity go? Short run + static checks for runaway excitation.
 
-usage: python diag.py [sugar|bitter] [w_syn scale]
+usage: python -m runs.diag [sugar|bitter] [w_syn scale]
 """
 import sys
 from pathlib import Path
@@ -8,9 +8,9 @@ from pathlib import Path
 import numpy as np
 import pandas as pd
 
-from sim import PARAMS, Brain, simulate
+from brain.sim import PARAMS, Brain, simulate
 
-ROOT = Path(__file__).parent
+ROOT = Path(__file__).resolve().parents[1]
 pd.set_option("display.width", 250, "display.max_columns", 30)
 
 
@@ -30,7 +30,7 @@ def main():
     print(f"edges where ONE spike alone crosses threshold (>{(PARAMS['v_th'] - PARAMS['v_0']) / (PARAMS['w_syn'] * 0.158):.0f} syn): "
           f"{strong.sum():,}   of which autapses: {(strong & auto).sum():,}")
 
-    stim_name = sys.argv[1] if len(sys.argv) > 1 else "sugar"   # python diag.py bitter 0.5
+    stim_name = sys.argv[1] if len(sys.argv) > 1 else "sugar"   # python -m runs.diag bitter 0.5
     scale = float(sys.argv[2]) if len(sys.argv) > 2 else 1.0
     by_type = meta.groupby("type")["idx"].apply(np.array).to_dict()
     types = {"sugar": ["LB3b", "LB3c"], "bitter": ["LB1a", "LB1b", "LB1c", "LB1d"]}[stim_name]

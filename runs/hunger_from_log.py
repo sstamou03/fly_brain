@@ -4,16 +4,16 @@ Used when the run is stopped early (the beer was dropped from the menu while it 
 Only drinks whose "-> drinks it from hunger" line (or "starving" with no bisection) is complete and that
 are still on the menu are kept; the ordering rule is the same as hunger.py's.
 
-usage: python hunger_from_log.py <log file> [--menu cocktails]
+usage: python -m runs.hunger_from_log <log file> [--menu cocktails]
 """
 import argparse
 import json
 import re
 from pathlib import Path
 
-from taste import MENUS
+from brain.taste import MENUS
 
-ROOT = Path(__file__).parent
+ROOT = Path(__file__).resolve().parents[1]
 
 
 def main():

@@ -10,10 +10,10 @@ from pathlib import Path
 import numpy as np
 import pandas as pd
 
-from sim import W_SYN_MALE_CNS, Brain, simulate
-from taste import CHANNELS, DRINKS, neuron_input, taste_matrix, taste_vector
+from brain.sim import W_SYN_MALE_CNS, Brain, simulate
+from brain.taste import CHANNELS, DRINKS, neuron_input, taste_matrix, taste_vector
 
-ROOT = Path(__file__).parent
+ROOT = Path(__file__).resolve().parents[1]
 N_RUN, T_RUN = 4, 500.0
 
 

@@ -11,7 +11,7 @@ that drive walking in real flies:
            minus MDN (backward walking, "moonwalker")
 Their activity becomes the app's `forward` (0..1) and `turn` (-1..1, positive = left) per bin.
 
-usage: python walk_brain.py [--seconds 12] [--threads 4]
+usage: python -m export.walk_brain [--seconds 12] [--threads 4]
 """
 import argparse
 import json
@@ -21,9 +21,9 @@ import numpy as np
 import pandas as pd
 import torch
 
-from sim import W_SYN_MALE_CNS, Brain, simulate
+from brain.sim import W_SYN_MALE_CNS, Brain, simulate
 
-ROOT = Path(__file__).parent
+ROOT = Path(__file__).resolve().parents[1]
 OUT = ROOT / "app" / "public" / "data" / "walk.json"
 SEG_MS = 400.0
 BIN_MS = 50.0

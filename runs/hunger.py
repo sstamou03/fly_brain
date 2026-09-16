@@ -5,7 +5,7 @@ accept bitter-laced sugar, so hunger h in [0, 1] scales the bitter channel by (1
 bisection finds the lowest hunger at which the feeding motor neuron (MN9_L) fires >= FIRE_HZ.
 The fly's choice is the drink it accepts at the lowest hunger; ties go to the stronger response.
 
-usage: python hunger.py [--menu cocktails] [--trials 4] [--steps 4]
+usage: python -m runs.hunger [--menu cocktails] [--trials 4] [--steps 4]
 """
 import argparse
 import json
@@ -14,10 +14,10 @@ from pathlib import Path
 import numpy as np
 import pandas as pd
 
-from sim import W_SYN_MALE_CNS, Brain, simulate
-from taste import CHANNELS, MENUS, neuron_input, taste_matrix, taste_vector
+from brain.sim import W_SYN_MALE_CNS, Brain, simulate
+from brain.taste import CHANNELS, MENUS, neuron_input, taste_matrix, taste_vector
 
-ROOT = Path(__file__).parent
+ROOT = Path(__file__).resolve().parents[1]
 FIRE_HZ = 5.0
 
 

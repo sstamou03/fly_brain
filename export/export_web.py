@@ -10,7 +10,7 @@ The app speaks in words, not measurements: every drink gets `likes` (0-100), a m
 plain traces over the tasting ("wants to drink" = feeding motor neuron activity, "tastes bitter" =
 the relays that receive most bitter input), plus which neurons light up in the 3D brain.
 
-usage: python export_web.py [--data ui/data.json] [--hunger results/hunger_cocktails.json]
+usage: python -m export.export_web [--data ui/data.json] [--hunger results/hunger_cocktails.json]
 """
 import argparse
 import json
@@ -21,7 +21,7 @@ from pathlib import Path
 import numpy as np
 import pandas as pd
 
-ROOT = Path(__file__).parent
+ROOT = Path(__file__).resolve().parents[1]
 OUT = ROOT / "app" / "public" / "data"
 FIRE_HZ = 60.0       # a trace reads "full" at this firing rate
 CLOUD_HZ = 20.0      # brain points are fully lit at this mean rate
