@@ -1,0 +1,566 @@
+<title>Fly Bar</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Young+Serif&family=Instrument+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap">
+<style>
+:root {
+  --ground: #E8EEEF;
+  --surface: #F5F8F8;
+  --raised: #FFFFFF;
+  --ink: #261C15;
+  --ink-soft: #685A50;
+  --line: #C8D2D4;
+  --spark: #C0392B;
+  --exc: #B7741A;
+  --inh: #4B56A3;
+  --node: #DAE2E4;
+  --fly-body: #7E5F37;
+  --wing: rgba(38, 28, 21, 0.10);
+  --good: #2E7A4C;
+  --warn: #9A6212;
+  --bad: #A2342A;
+  --serif: "Young Serif", Georgia, "Times New Roman", serif;
+  --sans: "Instrument Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --mono: "JetBrains Mono", ui-monospace, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --ground: #0E1316; --surface: #151D22; --raised: #1B252B; --ink: #E6EDEF; --ink-soft: #97A5AB;
+    --line: #2A373E; --spark: #FF6152; --exc: #E9A847; --inh: #8F98F2; --node: #24313A;
+    --fly-body: #C49C66; --wing: rgba(230, 237, 239, 0.14); --good: #5CC48A; --warn: #E9A847; --bad: #FF7A6B;
+  }
+}
+:root[data-theme="dark"] {
+  --ground: #0E1316; --surface: #151D22; --raised: #1B252B; --ink: #E6EDEF; --ink-soft: #97A5AB;
+  --line: #2A373E; --spark: #FF6152; --exc: #E9A847; --inh: #8F98F2; --node: #24313A;
+  --fly-body: #C49C66; --wing: rgba(230, 237, 239, 0.14); --good: #5CC48A; --warn: #E9A847; --bad: #FF7A6B;
+}
+
+* { box-sizing: border-box; }
+body {
+  margin: 0; background: var(--ground); color: var(--ink);
+  font: 15px/1.5 var(--sans);
+  padding-inline: clamp(16px, 4vw, 44px); padding-block: 28px 48px;
+}
+.wrap { max-width: 1180px; margin: 0 auto; display: grid; gap: 20px; }
+
+header { display: grid; gap: 6px; }
+h1 { font: 400 clamp(34px, 5vw, 50px)/1.05 var(--serif); margin: 0; letter-spacing: -0.01em; text-wrap: balance; }
+h1 span { color: var(--spark); }
+.lede { margin: 0; max-width: 62ch; color: var(--ink-soft); }
+.meta { margin: 0; font: 12px/1.4 var(--mono); color: var(--ink-soft); font-variant-numeric: tabular-nums; }
+
+.label { font: 600 11.5px/1.2 var(--sans); text-transform: uppercase; letter-spacing: 0.09em; color: var(--ink-soft); margin: 0; }
+
+.stage {
+  position: relative; background: var(--surface); border: 1px solid var(--line); border-radius: 16px;
+  padding: 86px clamp(12px, 2vw, 22px) 18px; display: grid; gap: 16px;
+}
+.toolbar { position: absolute; top: 14px; right: 14px; display: flex; gap: 8px; flex-wrap: wrap; justify-content: flex-end; }
+.btn {
+  font: 500 13px/1 var(--sans); color: var(--ink); background: var(--raised); border: 1px solid var(--line);
+  border-radius: 999px; padding: 8px 14px; cursor: pointer;
+}
+.btn:hover { border-color: var(--ink-soft); }
+.btn:focus-visible, .glass:focus-visible { outline: 2px solid var(--spark); outline-offset: 2px; }
+
+.glasses { display: grid; grid-template-columns: repeat(auto-fill, minmax(98px, 1fr)); gap: 10px; }
+.glass {
+  display: grid; gap: 3px; justify-items: center; align-content: start;
+  background: var(--raised); color: var(--ink); border: 1px solid var(--line);
+  border-radius: 8px 8px 22px 22px; padding: 12px 6px 11px; cursor: pointer; font: inherit;
+  transition: border-color .2s, box-shadow .2s, background-color .2s;
+}
+.glass .em { font-size: 30px; line-height: 1.1; }
+.glass .nm { font: 400 13.5px/1.15 var(--serif); text-align: center; text-wrap: balance; }
+.glass .sc { font: 11px/1.2 var(--mono); color: var(--ink-soft); font-variant-numeric: tabular-nums; }
+.glass[data-state="tasting"] { border-color: var(--spark); box-shadow: 0 0 0 3px color-mix(in oklab, var(--spark) 22%, transparent); }
+.glass[data-state="tasted"] .sc { color: var(--ink); }
+.glass[data-state="winner"] { border-color: var(--spark); background: color-mix(in oklab, var(--spark) 9%, var(--raised)); }
+.glass[data-state="winner"] .sc { color: var(--spark); font-weight: 500; }
+
+#fly { position: absolute; left: 0; top: 0; width: 60px; height: 60px; pointer-events: none; z-index: 5; will-change: transform; }
+#fly .body { fill: var(--fly-body); }
+#fly .eye { fill: var(--spark); }
+#fly .wing { fill: var(--wing); stroke: var(--ink-soft); stroke-width: .6; transform-box: view-box; }
+#fly .wl { transform-origin: 27px 22px; }
+#fly .wr { transform-origin: 33px 22px; }
+#fly.flying .wl { animation: flapL .07s infinite alternate; }
+#fly.flying .wr { animation: flapR .07s infinite alternate; }
+@keyframes flapL { to { transform: rotate(-24deg); } }
+@keyframes flapR { to { transform: rotate(24deg); } }
+#fly .leg { stroke: var(--fly-body); stroke-width: 1.2; stroke-linecap: round; fill: none; }
+#fly .proboscis {
+  stroke: var(--fly-body); stroke-width: 2.4; stroke-linecap: round;
+  transform-box: view-box; transform-origin: 30px 49px; transform: scaleY(var(--p, .2)); transition: transform .18s ease-out;
+}
+
+.now { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 10px 20px; align-items: end; border-top: 1px solid var(--line); padding-top: 14px; }
+.now-name { font: 400 26px/1.1 var(--serif); margin: 2px 0 0; min-height: 29px; }
+.chip { display: inline-block; font: 600 12px/1 var(--sans); padding: 6px 10px; border-radius: 999px; margin-top: 8px; border: 1px solid currentColor; }
+.chip.good { color: var(--good); } .chip.warn { color: var(--warn); } .chip.bad { color: var(--bad); } .chip.idle { color: var(--ink-soft); }
+.readouts { display: flex; gap: 22px; flex-wrap: wrap; }
+.readout { display: grid; gap: 2px; }
+.readout b { font: 500 22px/1.1 var(--mono); font-variant-numeric: tabular-nums; }
+.readout small { font: 11px/1.2 var(--mono); color: var(--ink-soft); }
+
+.final { margin: 0; font: 400 17px/1.4 var(--serif); max-width: 70ch; min-height: 24px; }
+.final em { font-style: normal; color: var(--spark); }
+
+.lower { display: grid; grid-template-columns: minmax(0, 1fr) 320px; gap: 20px; align-items: start; }
+@media (max-width: 920px) { .lower { grid-template-columns: 1fr; } }
+.panel { background: var(--surface); border: 1px solid var(--line); border-radius: 16px; padding: 16px 18px; display: grid; gap: 12px; }
+.panel-head { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; flex-wrap: wrap; }
+.panel-head h2 { font: 400 20px/1.2 var(--serif); margin: 0; }
+.clock { font: 12px/1 var(--mono); color: var(--ink-soft); font-variant-numeric: tabular-nums; }
+
+.scroll { overflow-x: auto; }
+#circuit { display: block; width: 100%; min-width: 700px; height: auto; }
+#circuit .col-label { font: 11px var(--mono); fill: var(--ink-soft); }
+#circuit .node { fill: var(--node); stroke-width: 1.3; }
+#circuit .node.exc { stroke: var(--exc); }
+#circuit .node.inh { stroke: var(--inh); }
+#circuit .edge { fill: none; opacity: .07; }
+#circuit .edge.exc { stroke: var(--exc); }
+#circuit .edge.inh { stroke: var(--inh); }
+#circuit .tlabel { font: 12px var(--sans); fill: var(--ink); }
+#circuit .mlabel { font: 600 13px var(--mono); fill: var(--ink); }
+.legend { display: flex; gap: 18px; flex-wrap: wrap; font: 12px/1.3 var(--sans); color: var(--ink-soft); }
+.legend span { display: inline-flex; align-items: center; gap: 7px; }
+.sw { width: 22px; height: 0; border-top: 2px solid; display: inline-block; }
+.sw.exc { border-color: var(--exc); } .sw.inh { border-color: var(--inh); }
+.dot { width: 11px; height: 11px; border-radius: 50%; display: inline-block; background: linear-gradient(90deg, var(--node), var(--spark)); }
+
+.side { display: grid; gap: 16px; }
+.bars { display: grid; gap: 6px; }
+.bar-row { display: grid; grid-template-columns: 92px minmax(0, 1fr) 38px; gap: 8px; align-items: center; font-size: 13px; }
+.bar-track { height: 7px; background: var(--node); border-radius: 4px; overflow: hidden; }
+.bar-fill { height: 100%; background: var(--ink-soft); width: 0; transition: width .3s; }
+.bar-row[data-ch="sweet"] .bar-fill { background: var(--exc); }
+.bar-row[data-ch="bitter"] .bar-fill { background: var(--inh); }
+.bar-row .v { font: 12px var(--mono); text-align: right; font-variant-numeric: tabular-nums; color: var(--ink-soft); }
+#trace { width: 100%; height: auto; display: block; }
+#trace .grid { stroke: var(--line); stroke-width: 1; }
+#trace .th { stroke: var(--spark); stroke-dasharray: 4 3; stroke-width: 1; }
+#trace .rest { stroke: var(--ink-soft); stroke-dasharray: 2 3; stroke-width: 1; }
+#trace .ax { font: 10px var(--mono); fill: var(--ink-soft); }
+#trace .line { fill: none; stroke: var(--ink); stroke-width: 1.6; }
+#trace .area { fill: color-mix(in oklab, var(--ink) 8%, transparent); stroke: none; }
+#trace .end { fill: var(--spark); }
+.list { list-style: none; margin: 0; padding: 0; display: grid; gap: 5px; }
+.list li { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 8px; font-size: 13px; align-items: baseline; }
+.list .t { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.list .t small { color: var(--ink-soft); font: 11px var(--mono); }
+.list .n { font: 12px var(--mono); font-variant-numeric: tabular-nums; }
+.rank li { grid-template-columns: 22px minmax(0, 1fr) auto; }
+.rank .pos { font: 12px var(--mono); color: var(--ink-soft); }
+.rank li.win .t, .rank li.win .n { color: var(--spark); }
+.empty { color: var(--ink-soft); font-size: 13px; margin: 0; }
+
+footer { color: var(--ink-soft); font-size: 12.5px; max-width: 86ch; line-height: 1.55; }
+footer b { color: var(--ink); font-weight: 600; }
+
+@media (prefers-reduced-motion: reduce) {
+  #fly.flying .wl, #fly.flying .wr { animation: none; }
+  .bar-fill, #fly .proboscis, .glass { transition: none; }
+}
+</style>
+
+<div class="wrap">
+  <header>
+    <h1>Fly <span>Bar</span></h1>
+    <p class="lede">Μια δροσόφιλα με τον εγκέφαλο που χαρτογράφησαν Google και Janelia δοκιμάζει κάθε ποτό και μένει σε αυτό που θέλει. Ό,τι βλέπεις είναι επανάληψη της πραγματικής προσομοίωσης: οι νευρώνες ανάβουν όπως πυροδότησαν.</p>
+    <p class="meta" id="meta"></p>
+  </header>
+
+  <section class="stage" id="stage" aria-label="Ο πάγκος του μπαρ">
+    <div class="toolbar">
+      <button class="btn" id="btn-speed" type="button">Κανονική ταχύτητα</button>
+      <button class="btn" id="btn-restart" type="button">Ξανά από την αρχή</button>
+    </div>
+    <svg id="fly" viewBox="0 0 60 60" aria-hidden="true">
+      <g class="wing wl"><ellipse cx="17" cy="15" rx="12" ry="5.5" transform="rotate(25 17 15)"/></g>
+      <g class="wing wr"><ellipse cx="43" cy="15" rx="12" ry="5.5" transform="rotate(-25 43 15)"/></g>
+      <path class="leg" d="M25 26 L15 31 M25 30 L14 37 M26 34 L17 43 M35 26 L45 31 M35 30 L46 37 M34 34 L43 43"/>
+      <ellipse class="body" cx="30" cy="16" rx="7" ry="10"/>
+      <ellipse class="body" cx="30" cy="31" rx="6.5" ry="7"/>
+      <circle class="body" cx="30" cy="42" r="5.5"/>
+      <circle class="eye" cx="26.2" cy="43.2" r="3.2"/>
+      <circle class="eye" cx="33.8" cy="43.2" r="3.2"/>
+      <line class="proboscis" x1="30" y1="47" x2="30" y2="58"/>
+    </svg>
+    <div class="glasses" id="glasses"></div>
+    <div class="now">
+      <div>
+        <p class="label" id="now-label">Η μύγα ετοιμάζεται</p>
+        <p class="now-name" id="now-name"></p>
+        <span class="chip idle" id="now-chip">—</span>
+      </div>
+      <div class="readouts" aria-live="polite">
+        <div class="readout"><small>MN9 · ρυθμός</small><b id="ro-hz">0 Hz</b></div>
+        <div class="readout"><small>MN9 · τάση</small><b id="ro-v">−52.0 mV</b></div>
+        <div class="readout"><small>χρόνος εγκεφάλου</small><b id="ro-t">0 ms</b></div>
+      </div>
+    </div>
+    <p class="final" id="final"></p>
+  </section>
+
+  <section class="lower">
+    <div class="panel">
+      <div class="panel-head">
+        <h2>Από τη γλώσσα στην προβοσκίδα</h2>
+        <span class="clock" id="clock"></span>
+      </div>
+      <div class="scroll"><svg id="circuit" role="img" aria-label="Κύκλωμα γεύσης προς τον κινητικό νευρώνα MN9"></svg></div>
+      <div class="legend">
+        <span><i class="sw exc"></i>διεγερτική σύναψη</span>
+        <span><i class="sw inh"></i>ανασταλτική σύναψη</span>
+        <span><i class="dot"></i>ο νευρώνας πυροδοτεί (0 → 60 Hz)</span>
+        <span>πάχος γραμμής = αριθμός συνάψεων</span>
+      </div>
+    </div>
+
+    <aside class="side">
+      <div class="panel">
+        <p class="label">Τι γεύση νιώθει</p>
+        <div class="bars" id="bars"></div>
+      </div>
+      <div class="panel">
+        <p class="label">Τάση του MN9</p>
+        <svg id="trace" viewBox="0 0 284 120" role="img" aria-label="Μεμβρανικό δυναμικό του MN9 στον χρόνο"></svg>
+      </div>
+      <div class="panel">
+        <p class="label">Πιο ενεργοί νευρώνες τώρα</p>
+        <ol class="list" id="top"></ol>
+      </div>
+      <div class="panel">
+        <p class="label">Κατάταξη</p>
+        <ol class="list rank" id="rank"></ol>
+      </div>
+    </aside>
+  </section>
+
+  <footer id="foot"></footer>
+</div>
+
+<script>
+const D = __DATA__;
+
+const CH = { sweet: "γλυκό", water: "νερό", bitter: "πικρό", ir94e: "Ir94e", low_salt: "λίγο αλάτι", high_salt: "πολύ αλάτι", fizz: "ανθρακικό" };
+const INHIB = new Set(["gaba", "glutamate", "histamine"]);
+const NS = "http://www.w3.org/2000/svg";
+const $ = (s) => document.querySelector(s);
+const reduced = matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+const drinks = D.drinks;
+const nBins = drinks[0].mn9_v.length;
+const nodes = D.nodes;
+const nodeById = Object.fromEntries(nodes.map((n) => [n.id, n]));
+const mn9 = nodes.find((n) => n.kind === "motor");
+const fires = (d) => d.mn9_hz >= 0.5;
+const score = (d) => (fires(d) ? 1000 + d.mn9_hz : d.mn9_v_mean);
+const ranking = [...drinks].sort((a, b) => score(b) - score(a));
+const winner = ranking[0];
+const fmtV = (v) => `${v < 0 ? "−" : ""}${Math.abs(v).toFixed(1)} mV`;
+const fmtScore = (d) => (fires(d) ? `${d.mn9_hz.toFixed(0)} Hz` : fmtV(d.mn9_v_mean));
+function verdict(d) {
+  if (fires(d)) return { txt: "Βγάζει την προβοσκίδα", cls: "good" };
+  if (d.mn9_v_mean > D.v_rest) return { txt: "Διστάζει, κάτω από το κατώφλι", cls: "warn" };
+  return { txt: "Το αποφεύγει", cls: "bad" };
+}
+function svg(tag, attrs, parent) {
+  const e = document.createElementNS(NS, tag);
+  for (const k in attrs) e.setAttribute(k, attrs[k]);
+  if (parent) parent.appendChild(e);
+  return e;
+}
+
+$("#meta").textContent =
+  `male CNS v1.0 · 166.700 νευρώνες · w_syn ${D.w_syn_mV.toFixed(4)} mV · ${D.n_trials} δοκιμές × ${D.t_run_ms} ms ανά ποτό`;
+$("#foot").innerHTML =
+  `<b>Πώς βγαίνει.</b> Κάθε ποτό είναι διάνυσμα [ζάχαρη, αλκοόλ, καφεΐνη, πικράδα, αλάτι, CO₂, pH], που μεταφράζεται σε ένταση για 7 γεύσεις και οδηγεί τους ${nodes.filter((n) => n.kind === "taste").reduce((s, n) => s + n.n_neurons, 0)} πραγματικούς γευστικούς νευρώνες σε πόδια, προβοσκίδα και φάρυγγα. ` +
+  `Ο εγκέφαλος προσομοιώνεται ολόκληρος (leaky integrate-and-fire, παράμετροι Shiu et al. 2024) και η μύγα κρίνει από τον κινητικό νευρώνα MN9: πρώτα πόσο πυροδοτεί, κι αν δεν πυροδοτεί, πόσο κοντά στο κατώφλι (${fmtV(D.v_th)}) έφτασε. ` +
+  `Το γράφημα δείχνει τους ${nodes.length - 8} ισχυρότερους ενδιάμεσους νευρώνες βάσει καλωδίωσης, όχι όλο τον εγκέφαλο. Οι καμπύλες ουσία → γεύση είναι υποθέσεις.`;
+
+/* ---------- glasses ---------- */
+const glassesEl = $("#glasses");
+const glassBtns = drinks.map((d, i) => {
+  const b = document.createElement("button");
+  b.type = "button";
+  b.className = "glass";
+  b.id = `glass-${i}`;
+  b.innerHTML = `<span class="em" aria-hidden="true">${d.emoji}</span><span class="nm">${d.name}</span><span class="sc">δεν το δοκίμασε</span>`;
+  b.setAttribute("aria-label", `Δώσε στη μύγα ${d.name}`);
+  b.addEventListener("click", () => manual(i));
+  glassesEl.appendChild(b);
+  return b;
+});
+
+/* ---------- circuit ---------- */
+const G = $("#circuit");
+const edgeMap = new Map(D.edges.map((e) => [`${e.source}>${e.target}`, e.synapses]));
+const syn = (s, t) => edgeMap.get(`${s}>${t}`) || 0;
+const cols = { taste: [], relay_in: [], relay_out: [], motor: [] };
+nodes.forEach((n) => cols[n.kind].push(n));
+cols.relay_in.sort((a, b) => (syn("ch:sweet", b.id) - syn("ch:bitter", b.id)) - (syn("ch:sweet", a.id) - syn("ch:bitter", a.id)));
+cols.relay_out.sort((a, b) => syn(b.id, mn9.id) - syn(a.id, mn9.id));
+
+const W = 900, TOP = 48;
+const H = Math.max(cols.relay_in.length, cols.relay_out.length) * 13 + TOP + 18;
+G.setAttribute("viewBox", `0 0 ${W} ${H}`);
+const X = { taste: 120, relay_in: 400, relay_out: 640, motor: 830 };
+const pos = {};
+function place(list, x) {
+  const step = (H - 18 - TOP) / Math.max(list.length, 1);
+  list.forEach((n, i) => (pos[n.id] = { x, y: TOP + step * (i + 0.5) }));
+}
+place(cols.taste, X.taste);
+place(cols.relay_in, X.relay_in);
+place(cols.relay_out, X.relay_out);
+pos[mn9.id] = { x: X.motor, y: TOP + (H - 18 - TOP) / 2 };
+
+[["γευστικοί νευρώνες", X.taste], ["πρώτοι σταθμοί", X.relay_in], ["πριν τον MN9", X.relay_out], ["κινητικός", X.motor]]
+  .forEach(([t, x]) => svg("text", { x, y: 20, "text-anchor": "middle", class: "col-label" }, G).textContent = t);
+
+const sign = (id) => (id.startsWith("ch:") ? 1 : INHIB.has(nodeById[id].nt) ? -1 : 1);
+const edgeLayer = svg("g", {}, G);
+const nodeLayer = svg("g", {}, G);
+const edgeEls = D.edges.filter((e) => pos[e.source] && pos[e.target]).map((e) => {
+  const a = pos[e.source], b = pos[e.target];
+  const d = a.x === b.x
+    ? `M${a.x},${a.y} C${a.x + 70},${a.y} ${b.x + 70},${b.y} ${b.x},${b.y}`
+    : `M${a.x},${a.y} C${(a.x + b.x) / 2},${a.y} ${(a.x + b.x) / 2},${b.y} ${b.x},${b.y}`;
+  const el = svg("path", {
+    d, class: `edge ${e.synapses >= 0 && sign(e.source) > 0 ? "exc" : "inh"}`,
+    "stroke-width": (0.35 + Math.log10(Math.abs(e.synapses) + 1) * 0.55).toFixed(2),
+  }, edgeLayer);
+  return { el, source: e.source };
+});
+const nodeEls = nodes.map((n) => {
+  const p = pos[n.id];
+  const r = n.kind === "taste" ? 9 : n.kind === "motor" ? 15 : 5;
+  const c = svg("circle", { cx: p.x, cy: p.y, r, class: `node ${sign(n.id) > 0 ? "exc" : "inh"}` }, nodeLayer);
+  const title = svg("title", {}, c);
+  title.textContent = n.kind === "taste"
+    ? `${CH[n.label]} · ${n.n_neurons} γευστικοί νευρώνες`
+    : `${n.label}${n.type ? ` (${n.type})` : ""} · ${n.nt} · ${n.superclass}`;
+  if (n.kind === "taste") {
+    svg("text", { x: p.x - 16, y: p.y + 4, "text-anchor": "end", class: "tlabel" }, nodeLayer).textContent = CH[n.label];
+  }
+  if (n.kind === "motor") {
+    svg("text", { x: p.x, y: p.y + 32, "text-anchor": "middle", class: "mlabel" }, nodeLayer).textContent = "MN9";
+  }
+  return { id: n.id, kind: n.kind, el: c };
+});
+
+/* ---------- side panels ---------- */
+const barsEl = $("#bars");
+const barRows = Object.keys(CH).map((ch) => {
+  const row = document.createElement("div");
+  row.className = "bar-row";
+  row.dataset.ch = ch;
+  row.innerHTML = `<span>${CH[ch]}</span><span class="bar-track"><span class="bar-fill"></span></span><span class="v">0.00</span>`;
+  barsEl.appendChild(row);
+  return row;
+});
+
+const T = $("#trace");
+const TV = { x0: 34, x1: 278, y0: 8, y1: 104, vmin: -66, vmax: -40 };
+const ty = (v) => TV.y1 - ((Math.max(TV.vmin, Math.min(TV.vmax, v)) - TV.vmin) / (TV.vmax - TV.vmin)) * (TV.y1 - TV.y0);
+const tx = (b) => TV.x0 + (b / (nBins - 1)) * (TV.x1 - TV.x0);
+[-60, -50, -40].forEach((v) => {
+  svg("line", { x1: TV.x0, x2: TV.x1, y1: ty(v), y2: ty(v), class: "grid" }, T);
+  svg("text", { x: TV.x0 - 4, y: ty(v) + 3, "text-anchor": "end", class: "ax" }, T).textContent = v;
+});
+svg("line", { x1: TV.x0, x2: TV.x1, y1: ty(D.v_th), y2: ty(D.v_th), class: "th" }, T);
+svg("text", { x: TV.x1, y: ty(D.v_th) - 4, "text-anchor": "end", class: "ax" }, T).textContent = "κατώφλι";
+svg("line", { x1: TV.x0, x2: TV.x1, y1: ty(D.v_rest), y2: ty(D.v_rest), class: "rest" }, T);
+svg("text", { x: TV.x1, y: ty(D.v_rest) + 11, "text-anchor": "end", class: "ax" }, T).textContent = "ηρεμία";
+svg("text", { x: TV.x0, y: 118, class: "ax" }, T).textContent = "0 ms";
+svg("text", { x: TV.x1, y: 118, "text-anchor": "end", class: "ax" }, T).textContent = `${D.t_run_ms} ms`;
+const traceArea = svg("path", { class: "area" }, T);
+const traceLine = svg("path", { class: "line" }, T);
+const traceEnd = svg("circle", { r: 3, class: "end" }, T);
+
+const tasted = new Set();
+function renderRank(final) {
+  const el = $("#rank");
+  const list = ranking.filter((d) => tasted.has(d));
+  if (!list.length) {
+    el.innerHTML = `<li><span></span><span class="empty">Η μύγα δεν έχει δοκιμάσει ακόμα τίποτα.</span><span></span></li>`;
+    return;
+  }
+  el.innerHTML = list.map((d, i) =>
+    `<li class="${final && d === winner ? "win" : ""}"><span class="pos">${i + 1}</span><span class="t">${d.emoji} ${d.name}</span><span class="n">${fmtScore(d)}</span></li>`
+  ).join("");
+}
+
+/* ---------- replay ---------- */
+function update(i, b) {
+  const d = drinks[i], act = d.activity;
+  for (const n of nodeEls) {
+    const r = (act[n.id] || [])[b] || 0;
+    const scale = n.kind === "taste" ? 180 : 60;
+    const p = Math.min(100, (r / scale) * 100);
+    n.el.style.fill = p < 1 ? "" : `color-mix(in oklab, var(--spark) ${p.toFixed(0)}%, var(--node))`;
+  }
+  for (const e of edgeEls) {
+    const r = (act[e.source] || [])[b] || 0;
+    const scale = e.source.startsWith("ch:") ? 180 : 60;
+    e.el.style.opacity = (0.07 + Math.min(1, r / scale) * 0.6).toFixed(3);
+  }
+  const hz = act[mn9.id][b], v = d.mn9_v[b];
+  const t = Math.round((b + 1) * D.bin_ms);
+  $("#ro-hz").textContent = `${Math.round(hz)} Hz`;
+  $("#ro-v").textContent = fmtV(v);
+  $("#ro-t").textContent = `${t} ms`;
+  $("#clock").textContent = `${d.emoji} ${d.name} · t = ${t} ms`;
+  flyEl.style.setProperty("--p", (0.2 + Math.min(1, hz / 80) * 0.8).toFixed(2));
+
+  let path = "";
+  for (let k = 0; k <= b; k++) path += `${k ? "L" : "M"}${tx(k).toFixed(1)},${ty(d.mn9_v[k]).toFixed(1)}`;
+  traceLine.setAttribute("d", path);
+  traceArea.setAttribute("d", `${path}L${tx(b).toFixed(1)},${TV.y1}L${TV.x0},${TV.y1}Z`);
+  traceEnd.setAttribute("cx", tx(b));
+  traceEnd.setAttribute("cy", ty(v));
+
+  const top = nodes.filter((n) => n.kind.startsWith("relay"))
+    .map((n) => ({ n, r: act[n.id][b] }))
+    .filter((x) => x.r > 0)
+    .sort((x, y) => y.r - x.r)
+    .slice(0, 5);
+  $("#top").innerHTML = top.length
+    ? top.map(({ n, r }) => `<li><span class="t">${n.label} <small>${n.nt}</small></span><span class="n">${Math.round(r)} Hz</span></li>`).join("")
+    : `<li><span class="empty">Κανένας ενδιάμεσος δεν πυροδοτεί αυτή τη στιγμή.</span><span></span></li>`;
+}
+
+function showDrink(i, label) {
+  const d = drinks[i];
+  $("#now-label").textContent = label;
+  $("#now-name").textContent = `${d.emoji} ${d.name}`;
+  barRows.forEach((row) => {
+    const val = d.taste_vector[row.dataset.ch];
+    row.querySelector(".bar-fill").style.width = `${(val * 100).toFixed(0)}%`;
+    row.querySelector(".v").textContent = val.toFixed(2);
+  });
+}
+function setChip(txt, cls) {
+  const c = $("#now-chip");
+  c.textContent = txt;
+  c.className = `chip ${cls}`;
+}
+
+const stage = $("#stage");
+const flyEl = $("#fly");
+let flyXY = { x: 18, y: 18 };
+let mode = "idle", cur = null, t0 = 0, flight = null, lastBin = -1, queue = [], slow = 3, pending = 0;
+
+function setFly(p) {
+  flyXY = p;
+  flyEl.style.transform = `translate(${p.x.toFixed(1)}px, ${p.y.toFixed(1)}px)`;
+}
+function anchor(i) {
+  const s = stage.getBoundingClientRect(), g = glassBtns[i].getBoundingClientRect();
+  return { x: g.left - s.left + g.width / 2 - 30, y: g.top - s.top - 54 };
+}
+function flyTo(i, done) {
+  const to = anchor(i);
+  if (reduced) { setFly(to); done(); return; }
+  flight = { from: { ...flyXY }, to, t0: performance.now(), dur: 850, done };
+  mode = "fly";
+  flyEl.classList.add("flying");
+  flyEl.style.setProperty("--p", ".2");
+}
+function taste(i) {
+  mode = "taste"; cur = i; t0 = performance.now(); lastBin = -1;
+  glassBtns[i].dataset.state = "tasting";
+  showDrink(i, "Δοκιμάζει");
+  setChip("ο εγκέφαλος αντιδρά…", "idle");
+}
+function finishTaste(i) {
+  const d = drinks[i];
+  tasted.add(d);
+  glassBtns[i].dataset.state = "tasted";
+  glassBtns[i].querySelector(".sc").textContent = fmtScore(d);
+  const v = verdict(d);
+  setChip(v.txt, v.cls);
+  renderRank(false);
+  mode = "idle";
+  pending = setTimeout(next, reduced ? 0 : 700);
+}
+function settle(i) {
+  mode = "settle"; cur = i; t0 = performance.now(); lastBin = -1;
+  glassBtns.forEach((b) => { if (b.dataset.state === "winner") b.dataset.state = "tasted"; });
+  glassBtns[i].dataset.state = "winner";
+  showDrink(i, "Έμεινε στο");
+  const d = drinks[i], v = verdict(d);
+  setChip(v.txt, v.cls);
+  renderRank(tasted.size === drinks.length);
+  const second = ranking[1];
+  $("#final").innerHTML = fires(d)
+    ? `Η μύγα κάθεται στο <em>${d.emoji} ${d.name}</em>: ο MN9 πυροδοτεί ${d.mn9_hz.toFixed(0)} Hz, οπότε βγάζει την προβοσκίδα και πίνει.`
+    : `Κανένα ποτό δεν έκανε τον MN9 να πυροδοτήσει. Η μύγα διαλέγει το λιγότερο κακό, <em>${d.emoji} ${d.name}</em>: έφερε τον MN9 στα ${fmtV(d.mn9_v_mean)}, πιο κοντά στο κατώφλι από το ${second.emoji} ${second.name} (${fmtV(second.mn9_v_mean)}).`;
+}
+function next() {
+  if (queue.length) { const i = queue.shift(); flyTo(i, () => taste(i)); }
+  else flyTo(drinks.indexOf(winner), () => settle(drinks.indexOf(winner)));
+}
+function reset() {
+  clearTimeout(pending);
+  tasted.clear();
+  glassBtns.forEach((b) => { b.dataset.state = ""; b.querySelector(".sc").textContent = "δεν το δοκίμασε"; });
+  $("#final").textContent = "";
+  renderRank(false);
+  queue = drinks.map((_, i) => i);
+  next();
+}
+function manual(i) {
+  clearTimeout(pending);
+  queue = [];
+  glassBtns.forEach((b) => { if (b.dataset.state === "tasting") b.dataset.state = tasted.size ? "tasted" : ""; });
+  flyTo(i, () => taste(i));
+}
+
+function frame(now) {
+  if (mode === "fly" && flight) {
+    const k = Math.min(1, (now - flight.t0) / flight.dur);
+    const e = k < 0.5 ? 2 * k * k : 1 - Math.pow(-2 * k + 2, 2) / 2;
+    const mx = (flight.from.x + flight.to.x) / 2, my = Math.min(flight.from.y, flight.to.y) - 60;
+    setFly({
+      x: (1 - e) ** 2 * flight.from.x + 2 * (1 - e) * e * mx + e * e * flight.to.x,
+      y: (1 - e) ** 2 * flight.from.y + 2 * (1 - e) * e * my + e * e * flight.to.y,
+    });
+    if (k >= 1) {
+      flyEl.classList.remove("flying");
+      const done = flight.done;
+      flight = null;
+      mode = "idle";
+      done();
+    }
+  } else if (mode === "taste" || mode === "settle") {
+    const dur = nBins * D.bin_ms * slow;
+    let elapsed = now - t0;
+    if (mode === "settle") elapsed %= dur;
+    const b = Math.min(nBins - 1, Math.floor((elapsed / dur) * nBins));
+    if (b !== lastBin) { lastBin = b; update(cur, b); }
+    if (mode === "taste" && now - t0 >= dur) finishTaste(cur);
+  }
+  requestAnimationFrame(frame);
+}
+
+$("#btn-restart").addEventListener("click", reset);
+$("#btn-speed").addEventListener("click", (ev) => {
+  slow = slow === 3 ? 1 : 3;
+  ev.currentTarget.textContent = slow === 3 ? "Κανονική ταχύτητα" : "Αργή κίνηση";
+});
+addEventListener("resize", () => {
+  if (mode !== "fly" && cur !== null) setFly(anchor(cur));
+});
+
+setFly(flyXY);
+showDrink(drinks.indexOf(winner), "Στο μενού απόψε");
+update(drinks.indexOf(winner), Math.floor(nBins / 2));
+renderRank(false);
+requestAnimationFrame(frame);
+setTimeout(reset, reduced ? 0 : 600);
+</script>

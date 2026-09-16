@@ -9,6 +9,12 @@ brain_meta.parquet
 results/*.parquet
 results/bar_rates/
 
+# web app: dependencies/build output; web_data/ is rebuilt by export_brain_cloud.py
+app/node_modules/
+app/dist/
+web_data/
+ui/rates/
+
 __pycache__/
 *.pyc
 .venv/

@@ -33,9 +33,13 @@ PARAMS = {
 }
 
 # Shiu's w_syn was tuned on FlyWire (~50M synapses); the male CNS has 124M. calibrate.py sweeps a
-# scale on it: bitter circuits ignite between 0.50 and 0.55 (spikes/s x6), sugar -> MN9 is silent
-# below 0.45. 0.5 is the largest scale that keeps bitter bounded.
-W_SYN_MALE_CNS = PARAMS["w_syn"] * 0.5
+# scale on it with 1 s runs (bitter ignition builds up slowly, 300 ms runs hide it):
+#   0.30-0.48 stable for sugar, bitter and sugar+bitter (late/early activity ~x1.0)
+#   0.50      bitter x3.5, sugar+bitter x10 -> runaway
+# Real drinks drive more taste neurons than the calibration stimuli, so 0.45 keeps a margin. At 0.45
+# every pilot drink stays stable and orange juice drives MN9_L to 86 Hz (water, espresso: 0).
+# FLYCNS (another male-CNS port of Shiu's model) needed 0.3 for stability, where feeding fails.
+W_SYN_MALE_CNS = PARAMS["w_syn"] * 0.45
 
 
 class Brain:
@@ -56,12 +60,15 @@ class Brain:
 
 @torch.no_grad()
 def simulate(brain, stim_idx, stim_hz, readout_idx=(), params=None, n_run=None, t_run=None,
-             bin_ms=10.0, seed=0, silence_idx=(), progress=True):
+             bin_ms=10.0, seed=0, silence_idx=(), progress=True, stim_seg_ms=None):
     """Run n_run trials in one batch.
 
-    stim_idx/stim_hz: neurons driven by Poisson input and their rates (Hz).
+    stim_idx/stim_hz: neurons driven by Poisson input and their rates (Hz). stim_hz may be 2-D
+    (n_stim, n_segments) with stim_seg_ms set: the rates then change every stim_seg_ms.
     readout_idx: neurons whose spike trains are kept in time bins.
-    Returns dict(rate=(N,) mean Hz over trials, readout=(n_run, R, n_bins) spike counts).
+    Returns dict(rate=(N,) mean Hz over trials, readout=(n_run, R, n_bins) spike counts,
+                 pop_hz=(n_bins,) spikes/s of all non-stimulated neurons, per trial,
+                 readout_v=(n_run, R, n_bins) mean membrane potential in mV, sampled after integration).
     """
     p = dict(PARAMS, **(params or {}))
     B = n_run or p["n_run"]
@@ -91,15 +98,26 @@ def simulate(brain, stim_idx, stim_hz, readout_idx=(), params=None, n_run=None, 
     silent = silent.repeat(B)
 
     stim_idx = torch.as_tensor(np.asarray(stim_idx, dtype=np.int64))
-    stim_p = torch.as_tensor(np.asarray(stim_hz, dtype=np.float32)) * (dt / 1000.0)
+    rates = np.asarray(stim_hz, dtype=np.float32)
+    segmented = rates.ndim == 2
+    if segmented:
+        seg_rates = torch.as_tensor(rates) * (dt / 1000.0)  # (n_stim, n_segments)
+        steps_per_seg = int(round(stim_seg_ms / dt))
+        stim_p = seg_rates[:, 0].repeat(B)
+    else:
+        stim_p = torch.as_tensor(rates * (dt / 1000.0)).repeat(B)
     stim_flat = (torch.arange(B)[:, None] * N + stim_idx[None, :]).reshape(-1)
-    stim_p = stim_p.repeat(B)
+    is_stim = torch.zeros(B * N, dtype=torch.bool)
+    is_stim[stim_flat] = True
 
     readout_idx = np.asarray(readout_idx, dtype=np.int64)
     R, n_bins = len(readout_idx), int(math.ceil(T / bin_ms))
     readout_pos = torch.full((N,), -1, dtype=torch.int64)
     readout_pos[torch.as_tensor(readout_idx)] = torch.arange(R)
     readout = torch.zeros(B * R * n_bins, dtype=torch.int32)
+    readout_flat = (torch.arange(B)[:, None] * N + torch.as_tensor(readout_idx)[None, :]).reshape(-1)
+    readout_u = torch.zeros(B * R, n_bins, dtype=torch.float64)  # summed membrane potential per bin
+    pop = np.zeros(n_bins, dtype=np.int64)  # spikes of non-stimulated neurons per bin, all trials
     steps_per_bin = int(round(bin_ms / dt))
 
     queue = [torch.empty(0, dtype=torch.int64)] * delay  # ring buffer of spike indices
@@ -111,6 +129,8 @@ def simulate(brain, stim_idx, stim_hz, readout_idx=(), params=None, n_run=None, 
         u_new = u * em + g * kg
         torch.where(active, u_new, u, out=u)
         torch.where(active, g * eg, g, out=g)
+        if R:
+            readout_u[:, t // steps_per_bin] += u[readout_flat]
 
         spk = torch.nonzero((u > u_th) & active & ~silent).squeeze(1)
 
@@ -127,6 +147,8 @@ def simulate(brain, stim_idx, stim_hz, readout_idx=(), params=None, n_run=None, 
                 g.index_add_(0, rep(trial, lens) * N + brain.post[pos], brain.weight[pos] * w_syn)
 
         # Poisson stimulus
+        if segmented and t % steps_per_seg == 0:
+            stim_p = seg_rates[:, min(t // steps_per_seg, seg_rates.shape[1] - 1)].repeat(B)
         fire = torch.rand(stim_flat.numel(), generator=gen) < stim_p
         if fire.any():
             u.index_add_(0, stim_flat[fire], torch.full((int(fire.sum()),), kick))
@@ -137,6 +159,7 @@ def simulate(brain, stim_idx, stim_hz, readout_idx=(), params=None, n_run=None, 
             g[spk] = 0.0
             refr_until[spk] = t + refr_steps
             counts[spk] += 1
+            pop[t // steps_per_bin] += int((~is_stim[spk]).sum())
             if R:
                 rp = readout_pos[spk % N]
                 keep = rp >= 0
@@ -150,4 +173,6 @@ def simulate(brain, stim_idx, stim_hz, readout_idx=(), params=None, n_run=None, 
 
     rate = counts.view(B, N).float().mean(0) / (T / 1000.0)
     return {"rate": rate.numpy(), "readout": readout.view(B, R, n_bins).numpy(), "bin_ms": bin_ms,
+            "pop_hz": pop / (B * bin_ms / 1000.0),
+            "readout_v": (readout_u / steps_per_bin + p["v_0"]).view(B, R, n_bins).float().numpy(),
             "n_run": B, "t_run": T, "seconds": time.time() - t0}

@@ -59,6 +59,22 @@ DRINKS = {
 }
 DRINKS = {name: np.array(v, dtype=float) for name, v in DRINKS.items()}
 
+# The user's cocktail menu. Their "bitterness" column (Campari, bitters, tonic quinine) sits in the ibu slot.
+#                            sugar   alc  caffeine bitter salt  CO2   pH
+COCKTAILS = {
+    "🥃 Negroni":            [104,  21.6,  0,     90,   0,    0,   3.8],
+    "🌿 Mojito":             [58,   11.0,  0,     10,   0,    3.0, 3.0],
+    "🍹 Paloma":             [55,   11.0,  0,     30,   2.5,  3.0, 3.0],
+    "🥃 Old Fashioned":      [51,   30.6,  0,     20,   0,    0,   4.5],
+    "🍸 Pornstar Martini":   [119,  14.1,  0,      0,   0,    0,   3.2],
+    "🥂 Aperol Spritz":      [75,    8.2,  0,     50,   0,    4.0, 3.5],
+    "🍸 Cosmopolitan":       [52.5, 15.7,  0,      5,   0,    0,   2.8],
+    "🍍 Piña Colada":        [89.5, 10.5,  0,      0,   0,    0,   4.0],
+    "🧊 Gin & Tonic":        [58.7,  8.7,  0,     60,   0,    3.5, 2.8],
+}
+COCKTAILS = {name: np.array(v, dtype=float) for name, v in COCKTAILS.items()}
+MENUS = {"classic": DRINKS, "cocktails": COCKTAILS}
+
 
 def mix(parts):
     """Cocktail = weighted average of drink vectors. pH mixes through [H+], not linearly.

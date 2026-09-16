@@ -15,8 +15,8 @@ from pathlib import Path
 import numpy as np
 import pandas as pd
 
-from sim import W_SYN_MALE_CNS, Brain, simulate
-from taste import CHANNELS, DRINKS, INGREDIENTS, neuron_input, taste_matrix, taste_vector
+from sim import PARAMS, W_SYN_MALE_CNS, Brain, simulate
+from taste import CHANNELS, INGREDIENTS, MENUS, neuron_input, taste_matrix, taste_vector
 
 ROOT = Path(__file__).parent
 
@@ -25,10 +25,15 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--trials", type=int, default=30)
     ap.add_argument("--ms", type=float, default=1000.0)
+    ap.add_argument("--menu", default="classic", choices=sorted(MENUS))
     ap.add_argument("--only", default="", help="comma-separated substrings of drink names")
+    ap.add_argument("--scale", type=float, default=None, help="w_syn scale (default: W_SYN_MALE_CNS)")
     args = ap.parse_args()
+    w_syn = PARAMS["w_syn"] * args.scale if args.scale else W_SYN_MALE_CNS
+    bin_ms = 50.0
+    early, late = slice(2, 6), slice(int((args.ms - 200) / bin_ms), None)  # 100-300 ms vs last 200 ms
     only = [s for s in args.only.split(",") if s]
-    drinks = {k: v for k, v in DRINKS.items() if not only or any(s in k for s in only)}
+    drinks = {k: v for k, v in MENUS[args.menu].items() if not only or any(s in k for s in only)}
     n_run, t_run = args.trials, args.ms
 
     out = ROOT / "results"
@@ -41,7 +46,7 @@ def main():
     grn_idx, M, organ = taste_matrix(meta)
     print(f"taste neurons touching the drink: {len(grn_idx)} "
           f"({', '.join(f'{o} {int((organ == o).sum())}' for o in np.unique(organ))})   "
-          f"w_syn {W_SYN_MALE_CNS:.4f} mV   {n_run} trials x {t_run:.0f} ms")
+          f"w_syn {w_syn:.4f} mV   {n_run} trials x {t_run:.0f} ms")
 
     rows = []
     for name, x in drinks.items():
@@ -49,8 +54,9 @@ def main():
         u = neuron_input(t, M)
         on = u >= 1.0  # ignore channels that are only numerically non-zero
         print(f"\n== {name}  taste = [" + " ".join(f"{c} {v:.2f}" for c, v in zip(CHANNELS, t)) + "]", flush=True)
-        r = simulate(brain, grn_idx[on], u[on], readout_idx=mn9, n_run=n_run, t_run=t_run,
-                     params={"w_syn": W_SYN_MALE_CNS}, progress=False)
+        r = simulate(brain, grn_idx[on], u[on], readout_idx=mn9, n_run=n_run, t_run=t_run, bin_ms=bin_ms,
+                     params={"w_syn": w_syn}, progress=False)
+        pop = r["pop_hz"]
         per_trial = r["readout"][:, 0].sum(1) / (t_run / 1000.0)  # MN9_L
         rest = np.ones(brain.n, bool)
         rest[grn_idx[on]] = False
@@ -64,12 +70,14 @@ def main():
             "neurons_over_10hz": int((r["rate"][rest] > 10).sum()),
             "neurons_over_100hz": int((r["rate"][rest] > 100).sum()),
             "spikes_per_s": float(r["rate"][rest].sum()), "stimulated_neurons": int(on.sum()),
+            "growth": float(pop[late].mean() / max(pop[early].mean(), 1.0)), "pop_hz": pop.round(0).tolist(),
             "drink_vector": dict(zip(INGREDIENTS, x.tolist())),
             "taste_vector": dict(zip(CHANNELS, t.round(3).tolist())), "seconds": r["seconds"],
         })
         x_ = rows[-1]
         print(f"   MN9 {x_['mn9_hz']:6.1f} ± {x_['mn9_sem']:.1f} Hz   >10Hz {x_['neurons_over_10hz']:,}   "
-              f">100Hz {x_['neurons_over_100hz']:,}   spikes/s {x_['spikes_per_s']:,.0f}   {r['seconds']:.0f}s", flush=True)
+              f">100Hz {x_['neurons_over_100hz']:,}   spikes/s {x_['spikes_per_s']:,.0f}   growth x{x_['growth']:.1f}   "
+              f"{r['seconds']:.0f}s", flush=True)
 
     rows.sort(key=lambda row: -row["mn9_hz"])
     top = max(rows[0]["mn9_hz"], 1e-9)
@@ -77,9 +85,11 @@ def main():
     for i, row in enumerate(rows, 1):
         bar = "█" * int(round(30 * row["mn9_hz"] / top))
         print(f"{i:2d}. {row['emoji']} {row['drink']:<18} {row['mn9_hz']:6.1f} ± {row['mn9_sem']:4.1f} Hz  {bar}")
-    run = {"n_run": n_run, "t_run_ms": t_run, "w_syn_mV": W_SYN_MALE_CNS, "dataset": "male-cns v1.0", "only": only}
-    (out / ("bar_pilot.json" if only else "bar.json")).write_text(
-        json.dumps({"run": run, "ranking": rows}, indent=2, ensure_ascii=False))
+    run = {"n_run": n_run, "t_run_ms": t_run, "w_syn_mV": w_syn, "dataset": "male-cns v1.0",
+           "menu": args.menu, "only": only}
+    tag = ("" if args.menu == "classic" else f"_{args.menu}") + (f"_scale{args.scale}" if args.scale else "")
+    (out / (f"bar_pilot{tag}.json" if only else f"bar{tag}.json")).write_text(
+        json.dumps({"run": run, "ranking": rows}, indent=2, ensure_ascii=False), encoding="utf-8")
 
 
 if __name__ == "__main__":

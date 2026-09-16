@@ -1,0 +1,74 @@
+[
+  {
+    "condition": "cola, all organs",
+    "stimulated": 421,
+    "mn9_l_hz": 0.0,
+    "over_10hz": 969,
+    "over_100hz": 75,
+    "spikes_per_s": 45841.5,
+    "seconds": 24.478353261947632
+  },
+  {
+    "condition": "cola, mouth only (labellum+pharynx)",
+    "stimulated": 181,
+    "mn9_l_hz": 0.0,
+    "over_10hz": 2285,
+    "over_100hz": 32,
+    "spikes_per_s": 82773.0,
+    "seconds": 20.730268955230713
+  },
+  {
+    "condition": "cola, legs only",
+    "stimulated": 240,
+    "mn9_l_hz": 0.0,
+    "over_10hz": 1354,
+    "over_100hz": 45,
+    "spikes_per_s": 75549.0,
+    "seconds": 20.706665992736816
+  },
+  {
+    "condition": "cola without bitter, all organs",
+    "stimulated": 358,
+    "mn9_l_hz": 105.0,
+    "over_10hz": 792,
+    "over_100hz": 86,
+    "spikes_per_s": 41156.5,
+    "seconds": 20.113770484924316
+  },
+  {
+    "condition": "sweet only, all organs",
+    "stimulated": 267,
+    "mn9_l_hz": 98.0,
+    "over_10hz": 756,
+    "over_100hz": 52,
+    "spikes_per_s": 36529.0,
+    "seconds": 19.963568210601807
+  },
+  {
+    "condition": "sweet only, mouth only",
+    "stimulated": 52,
+    "mn9_l_hz": 99.0,
+    "over_10hz": 471,
+    "over_100hz": 35,
+    "spikes_per_s": 24340.0,
+    "seconds": 19.67643904685974
+  },
+  {
+    "condition": "bitter only, mouth only",
+    "stimulated": 38,
+    "mn9_l_hz": 0.0,
+    "over_10hz": 5139,
+    "over_100hz": 45,
+    "spikes_per_s": 149125.5,
+    "seconds": 21.594030380249023
+  },
+  {
+    "condition": "bitter only, legs only",
+    "stimulated": 25,
+    "mn9_l_hz": 0.0,
+    "over_10hz": 1263,
+    "over_100hz": 29,
+    "spikes_per_s": 68243.5,
+    "seconds": 20.357177019119263
+  }
+]

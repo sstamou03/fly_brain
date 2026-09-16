@@ -1,0 +1,71 @@
+{
+  "run": {
+    "n_run": 10,
+    "t_run_ms": 1000.0,
+    "w_syn_mV": 0.12375000000000001,
+    "dataset": "male-cns v1.0",
+    "menu": "cocktails",
+    "only": [
+      "Lager"
+    ]
+  },
+  "ranking": [
+    {
+      "drink": "Lager Beer",
+      "emoji": "🍺",
+      "slug": "Lager_Beer",
+      "mn9_hz": 0.0,
+      "mn9_sem": 0.0,
+      "mn9_lr": [
+        0.0,
+        0.0
+      ],
+      "neurons_over_10hz": 651,
+      "neurons_over_100hz": 42,
+      "spikes_per_s": 30019.69921875,
+      "stimulated_neurons": 403,
+      "growth": 1.00464090203448,
+      "pop_hz": [
+        19572.0,
+        29638.0,
+        30938.0,
+        30544.0,
+        30446.0,
+        30462.0,
+        30648.0,
+        30082.0,
+        30850.0,
+        30138.0,
+        31492.0,
+        30648.0,
+        29680.0,
+        30774.0,
+        31334.0,
+        30190.0,
+        31444.0,
+        31038.0,
+        29820.0,
+        30656.0
+      ],
+      "drink_vector": {
+        "sugar_gL": 15.0,
+        "abv_pct": 5.0,
+        "caffeine_mgL": 0.0,
+        "ibu": 20.0,
+        "salt_gL": 0.0,
+        "co2_gL": 2.6,
+        "ph": 4.2
+      },
+      "taste_vector": {
+        "sweet": 0.576,
+        "water": 0.143,
+        "bitter": 0.4,
+        "ir94e": 0.0,
+        "low_salt": 0.0,
+        "high_salt": 0.0,
+        "fizz": 0.464
+      },
+      "seconds": 263.4260675907135
+    }
+  ]
+}
